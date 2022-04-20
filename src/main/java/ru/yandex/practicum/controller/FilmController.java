@@ -14,13 +14,12 @@ import java.util.Map;
 
 @RestController
 @Slf4j
-@Validated
 public class FilmController {
     private final Map<Integer, Film> films = new HashMap<>();
 
     //Create film
     @PostMapping("/films")
-    public void create(@Valid @RequestBody Film film) {
+    public void create(@RequestBody Film film) {
         validate(film);
         log.debug("Фильм: {}, успешно создан", film);
         films.put(film.getId(), film);
@@ -28,7 +27,7 @@ public class FilmController {
 
     //Update film
     @PutMapping("/films")
-    public void update(@Valid @RequestBody Film film) {
+    public void update(@RequestBody Film film) {
         validate(film);
         log.debug("Фильм: {}, успешно обновлен", film);
         films.put(film.getId(), film);

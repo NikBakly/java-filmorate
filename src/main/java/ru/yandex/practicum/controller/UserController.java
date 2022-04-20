@@ -14,13 +14,12 @@ import java.util.Map;
 
 @RestController
 @Slf4j
-@Validated
 public class UserController {
     private final Map<String, User> users = new HashMap<>();
 
     //Create user
     @PostMapping("/users")
-    public void create(@Valid @RequestBody User user) {
+    public void create(@RequestBody User user) {
         validate(user);
         if (user.getName() == null || user.getName().isBlank()) {
             log.warn("У пользователя поле nickname и login одинаковый, т.к. поле nickname было пустое");
@@ -32,7 +31,7 @@ public class UserController {
 
     //Update user
     @PutMapping("/users")
-    public void update(@Valid @RequestBody User user) {
+    public void update(@RequestBody User user) {
         validate(user);
         if (user.getName() == null || user.getName().isBlank()) {
             log.warn("У пользователя поле nickname и login одинаковый, т.к. поле nickname было пустое");
