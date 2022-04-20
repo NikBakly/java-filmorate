@@ -15,14 +15,14 @@ import java.util.Map;
 @RestController
 @Slf4j
 public class FilmController {
-    private final Map<String, Film> films = new HashMap<>();
+    private final Map<LocalDate, Film> films = new HashMap<>();
 
     //Create film
     @PostMapping("/films")
     public void create(@RequestBody Film film) {
         validate(film);
         log.debug("Фильм: {}, успешно создан", film);
-        films.put(film.getName(), film);
+        films.put(film.getReleaseDate(), film);
     }
 
     //Update film
@@ -30,7 +30,7 @@ public class FilmController {
     public void update(@RequestBody Film film) {
         validate(film);
         log.debug("Фильм: {}, успешно обновлен", film);
-        films.put(film.getName(), film);
+        films.put(film.getReleaseDate(), film);
     }
 
     //get film
@@ -39,7 +39,7 @@ public class FilmController {
         return films.values();
     }
 
-    private void validate(Film film) {
+    private void validate(@Valid Film film) {
         if (film.getName().isBlank()) {
             log.warn("У фильма поле name пустое");
             throw new ValidationException("Название фильма не может быть пустым");

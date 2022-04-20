@@ -47,7 +47,7 @@ public class UserController {
         return users.values();
     }
 
-    private void validate(User user) {
+    private void validate(@Valid User user) {
         if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.warn("У пользователя поле email пустое или не содержит '@'");
             throw new ValidationException("Поле с email не может быть пустым или email должен содержать '@'");
