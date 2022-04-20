@@ -15,14 +15,14 @@ import java.util.Map;
 @RestController
 @Slf4j
 public class FilmController {
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final Map<String, Film> films = new HashMap<>();
 
     //Create film
     @PostMapping("/films")
     public void create(@RequestBody Film film) {
         validate(film);
         log.debug("Фильм: {}, успешно создан", film);
-        films.put(film.getId(), film);
+        films.put(film.getName(), film);
     }
 
     //Update film
@@ -30,7 +30,7 @@ public class FilmController {
     public void update(@RequestBody Film film) {
         validate(film);
         log.debug("Фильм: {}, успешно обновлен", film);
-        films.put(film.getId(), film);
+        films.put(film.getName(), film);
     }
 
     //get film
