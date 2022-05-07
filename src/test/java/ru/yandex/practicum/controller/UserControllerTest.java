@@ -1,21 +1,50 @@
 package ru.yandex.practicum.controller;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.User;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @SpringBootTest
 class UserControllerTest {
-    private final UserController controller = new UserController();
+    private final UserController controller;
+
+    private User nikita;
+    private User sasha;
+
+    @BeforeEach
+    void init(){
+        nikita = User.builder()
+                .id(1L)
+                .email("nikita@ya.ru")
+                .login("login")
+                .name("nickname")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+        sasha = User.builder()
+                .id(2L)
+                .email("sasha@ya.ru")
+                .login("login")
+                .name("nickname")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+    }
+
+    @Autowired
+    public UserControllerTest(UserController controller) {
+        this.controller = controller;
+    }
 
     @Test
     void test1_shouldThrowExceptionIfEmailWithoutCat() {
         User user = User.builder()
-                .id(1)
+                .id(1L)
                 .email("nikita")
                 .login("login")
                 .name("nickname")
@@ -31,7 +60,7 @@ class UserControllerTest {
     @Test
     void test2_shouldThrowExceptionIfEmailIsEmpty() {
         User user = User.builder()
-                .id(1)
+                .id(1L)
                 .email("")
                 .login("login")
                 .name("nickname")
@@ -47,7 +76,7 @@ class UserControllerTest {
     @Test
     void test3_shouldThrowExceptionIfLoginIsEmpty() {
         User user = User.builder()
-                .id(1)
+                .id(1L)
                 .email("nik@ya.ru")
                 .login("")
                 .name("nickname")
@@ -63,7 +92,7 @@ class UserControllerTest {
     @Test
     void test4_shouldThrowExceptionIfLoginContainsSpaces() {
         User user = User.builder()
-                .id(1)
+                .id(1L)
                 .email("nik@ya.ru")
                 .login("lo gin")
                 .name("nickname")
@@ -79,7 +108,7 @@ class UserControllerTest {
     @Test
     void test5_shouldThrowExceptionIfDateOfBirthInFuture() {
         User user = User.builder()
-                .id(1)
+                .id(1L)
                 .email("nik@ya.ru")
                 .login("login")
                 .name("nickname")
@@ -95,7 +124,7 @@ class UserControllerTest {
     @Test
     void test6_shouldLoginAndNicknameBeSameIfNicknameIsEmpty() {
         User user = User.builder()
-                .id(1)
+                .id(1L)
                 .email("nik@ya.ru")
                 .login("login")
                 .name("")
@@ -109,4 +138,68 @@ class UserControllerTest {
 
         Assertions.assertTrue(controller.findAll().contains(user));
     }
+
+    @Test
+    void test7_shouldAddToFriend() {
+        controller.create(nikita);
+        controller.create(sasha);
+
+        controller.addToFriend(nikita.getId(), sasha.getId());
+
+        Assertions.assertTrue(nikita.getFriends().contains(2L) && sasha.getFriends().contains(1L));
+    }
+
+    @Test
+    void test8_shouldDeleteFriend() {
+        controller.create(nikita);
+        controller.create(sasha);
+        controller.addToFriend(nikita.getId(), sasha.getId());
+
+        controller.deleteFriend(nikita.getId(), sasha.getId());
+
+        Assertions.assertFalse(nikita.getFriends().contains(2L) && sasha.getFriends().contains(1L));
+    }
+
+    @Test
+    void test9_shouldGetMutualFriends() {
+        User vanya = User.builder()
+                .id(3L)
+                .email("vanya@ya.ru")
+                .login("login")
+                .name("nickname")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+        User alex = User.builder()
+                .id(4L)
+                .email("vanya@ya.ru")
+                .login("login")
+                .name("nickname")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+        User maks = User.builder()
+                .id(4L)
+                .email("maks@ya.ru")
+                .login("login")
+                .name("nickname")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+
+        controller.create(nikita);
+        controller.create(sasha);
+        controller.create(vanya);
+        controller.create(alex);
+        controller.create(maks);
+
+        controller.addToFriend(nikita.getId(), sasha.getId());
+        controller.addToFriend(nikita.getId(), vanya.getId());
+        controller.addToFriend(nikita.getId(), maks.getId());
+
+        controller.addToFriend(sasha.getId(), vanya.getId());
+        controller.addToFriend(sasha.getId(), alex.getId());
+
+        List<User> mutualFriends = controller.getMutualFriends(nikita.getId(), sasha.getId());
+        Assertions.assertFalse(mutualFriends.size() == 1 && mutualFriends.contains(vanya));
+    }
+
+
 }
