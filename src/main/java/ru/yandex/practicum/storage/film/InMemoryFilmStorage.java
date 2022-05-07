@@ -1,14 +1,12 @@
 package ru.yandex.practicum.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.Film;
+import ru.yandex.practicum.service.IdFilmService;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -20,19 +18,29 @@ import java.util.Map;
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
+    private final IdFilmService idFilmService;
 
-    @Override
-    public void create( Film film) {
-        validate(film);
-        log.debug("Фильм: {}, успешно создан", film);
-        films.put(film.getId(), film);
+    @Autowired
+    public InMemoryFilmStorage(IdFilmService idFilmService) {
+        this.idFilmService = idFilmService;
     }
 
     @Override
-    public void update( Film film) {
+    public Film create(Film film) {
+        validate(film);
+        //назначаем id фильму
+        film = film.toBuilder().id(idFilmService.getNextFilmId()).build();
+        log.debug("Фильм: {}, успешно создан", film);
+        films.put(film.getId(), film);
+        return film;
+    }
+
+    @Override
+    public Film update(Film film) {
         validate(film);
         log.debug("Фильм: {}, успешно обновлен", film);
         films.put(film.getId(), film);
+        return film;
     }
 
     @Override
@@ -54,7 +62,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.warn("У фильма поле name пустое");
             throw new ValidationException("Название фильма не может быть пустым");
         }
-        if (film.getDescription().length() > 200) {
+        if (film.getDescription().length() > 200 || film.getDescription().isBlank()) {
             log.warn("У фильма поле description содержит более 200 символов");
             throw new ValidationException("Описание фильма не может превышать 200 символов");
         }
@@ -62,7 +70,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.warn("У фильма поле realeseDate раньше даты 28 декабря 1985");
             throw new ValidationException("Дата релиза не должна быть раньше чем 28 декабря 1985");
         }
-        if (film.getDuration().isNegative() || film.getDuration().getSeconds() == 0) {
+        if (film.getDuration() <= 0) {
             log.warn("У фильма поле duration не является положительным числом");
             throw new ValidationException("Продолжительность фильма должна быть положительной");
         }

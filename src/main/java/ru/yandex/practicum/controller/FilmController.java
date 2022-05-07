@@ -3,12 +3,10 @@ package ru.yandex.practicum.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.model.User;
 import ru.yandex.practicum.service.FilmService;
 import ru.yandex.practicum.storage.film.FilmStorage;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -16,7 +14,6 @@ public class FilmController {
     private final FilmStorage filmStorage;
     private final FilmService filmService;
 
-    private Long filmId = 1L;
 
     @Autowired
     public FilmController(FilmStorage filmStorage) {
@@ -26,21 +23,17 @@ public class FilmController {
 
     //Create film
     @PostMapping("/films")
-    public void create(@RequestBody Film film) {
-        if (film.getId() == null) {
-            //Назначение пользователю id программно
-            film = film.toBuilder().id(filmId++).build();
-        }
+    public Film create(@RequestBody Film film) {
         if (film.getRate() == null) {
             film = film.toBuilder().rate(0L).build();
         }
-        filmStorage.create(film);
+        return filmStorage.create(film);
     }
 
     //Update film
     @PutMapping("/films")
-    public void update(@RequestBody Film film) {
-        filmStorage.update(film);
+    public Film update(@RequestBody Film film) {
+        return filmStorage.update(film);
     }
 
     //get film

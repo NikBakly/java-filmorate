@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.model.User;
 import ru.yandex.practicum.storage.film.FilmStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -28,12 +30,8 @@ public class FilmService {
             log.warn("Пользователь под id = " + userId + " уже ставил лайк фильму");
             throw new ValidationException("Пользователь под id = " + userId + " уже ставил лайк фильму");
         }
-        //Получаем оценки фильма
-        Long filmRate = getFilmRate(filmId);
-
         //Увеличиваем оценку фильма на 1
         addFilmLike(filmId);
-
         //Записываем пользователя в оценившие
         appreciatedUsers.add(userId);
 

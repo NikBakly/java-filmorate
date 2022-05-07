@@ -3,23 +3,29 @@ package ru.yandex.practicum.controller;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.User;
+import ru.yandex.practicum.service.IdUserService;
+import ru.yandex.practicum.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @SpringBootTest
 class UserControllerTest {
-    private final UserController controller;
-
+    private UserController controller;
     private User nikita;
     private User sasha;
 
+    UserControllerTest() {
+    }
+
     @BeforeEach
     void init(){
+        UserStorage userStorage = new InMemoryUserStorage( new IdUserService());
+        controller = new UserController(userStorage);
         nikita = User.builder()
                 .id(1L)
                 .email("nikita@ya.ru")
@@ -34,11 +40,6 @@ class UserControllerTest {
                 .name("nickname")
                 .birthday(LocalDate.of(2002, 10, 10))
                 .build();
-    }
-
-    @Autowired
-    public UserControllerTest(UserController controller) {
-        this.controller = controller;
     }
 
     @Test

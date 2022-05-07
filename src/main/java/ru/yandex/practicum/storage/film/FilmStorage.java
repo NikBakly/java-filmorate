@@ -5,9 +5,9 @@ import ru.yandex.practicum.model.Film;
 import java.util.Collection;
 
 public interface FilmStorage {
-    void create(Film film);
+    Film create(Film film);
 
-    void update(Film film);
+    Film update(Film film);
 
     Film findFilmById(Long filmId);
 

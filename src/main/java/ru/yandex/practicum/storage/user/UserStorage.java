@@ -5,9 +5,9 @@ import ru.yandex.practicum.model.User;
 import java.util.Collection;
 
 public interface UserStorage {
-    void create(User user);
+    User create(User user);
 
-    void update(User user);
+    User update(User user);
 
     User findUserById(Long userId);
 

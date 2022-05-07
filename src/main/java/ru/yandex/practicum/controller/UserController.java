@@ -17,7 +17,6 @@ public class UserController {
     private final UserStorage userStorage;
     private final UserService userService;
 
-    private Long userId = 1L;
 
     @Autowired
     public UserController(UserStorage userStorage) {
@@ -27,21 +26,23 @@ public class UserController {
 
     //Create user
     @PostMapping("/users")
-    public void create(@RequestBody User user) {
-        if (user.getId() == null) {
-            //Назначение пользователю id программно
-            user = user.toBuilder().id(userId++).build();
-        }
+    public User create(@RequestBody User user) {
         if (user.getFriends() == null) {
+            //Создаем множество друзей напрямую
             user = user.toBuilder().friends(new HashSet<>()).build();
         }
-        userStorage.create(user);
+        //Назначаем id пользователю
+        return userStorage.create(user);
     }
 
     //Update user
     @PutMapping("/users")
-    public void update(@RequestBody User user) {
-        userStorage.update(user);
+    public User update(@RequestBody User user) {
+        if (user.getFriends() == null) {
+            //Создаем множество друзей напрямую
+            user = user.toBuilder().friends(new HashSet<>()).build();
+        }
+        return userStorage.update(user);
     }
 
     //Get all users
