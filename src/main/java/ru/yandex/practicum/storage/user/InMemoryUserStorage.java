@@ -56,11 +56,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public void delete(Long userId) {
+        checkUser(userId);
+        users.remove(userId);
+    }
+
+    @Override
     public User findUserById(Long userId) {
-        if (userId < 0 || !users.containsKey(userId)) {
-            log.warn("Пользователь под id " + userId + " не найден");
-            throw new NotFoundException("Пользователь под id " + userId + " не найден");
-        }
+        checkUser(userId);
         return users.get(userId);
     }
 
@@ -76,6 +79,13 @@ public class InMemoryUserStorage implements UserStorage {
         if (user.getBirthday().isAfter(LocalDate.now())) {
             log.warn("У пользователя поле dateOfBirth не правильно определено");
             throw new ValidationException("День рождения не может быть в будущем");
+        }
+    }
+
+    private void checkUser(Long userId) {
+        if (userId < 0 || !users.containsKey(userId)) {
+            log.warn("Пользователь под id " + userId + " не найден");
+            throw new NotFoundException("Пользователь под id " + userId + " не найден");
         }
     }
 }

@@ -174,4 +174,13 @@ class FilmControllerTest {
 
         Assertions.assertEquals(expectedPopularFilms, popularFilms);
     }
+
+    @Test
+    void test10_shouldDeleteFilmById() {
+        controllerFilm.create(guardian);
+
+        controllerFilm.delete(guardian.getId());
+
+        Assertions.assertEquals(0, controllerFilm.findAll().size());
+    }
 }

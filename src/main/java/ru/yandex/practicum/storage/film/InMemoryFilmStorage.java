@@ -37,10 +37,17 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
+        checkFilm(film.getId());
         validate(film);
         log.debug("Фильм: {}, успешно обновлен", film);
         films.put(film.getId(), film);
         return film;
+    }
+
+    @Override
+    public void delete(Long filmId) {
+        checkFilm(filmId);
+        films.remove(filmId);
     }
 
     @Override
@@ -55,6 +62,13 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("Фильм под id " + filmId + " не найден");
         }
         return films.get(filmId);
+    }
+
+    private void checkFilm(Long filmId){
+        if (filmId < 0 || !films.containsKey(filmId)){
+            log.warn("Фильм id " + filmId + " не найден");
+            throw new NotFoundException("Фильм id " + filmId + " не найден");
+        }
     }
 
     private void validate(@Valid Film film) {
