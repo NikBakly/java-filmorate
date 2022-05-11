@@ -3,22 +3,30 @@ package ru.yandex.practicum.model;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.Duration;
 import java.time.LocalDate;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Film {
-    @NotNull
-    private final int id;
+    private Long id;
     @NotEmpty
     private final String name;
     private final String description;
     @NotNull
     private final LocalDate releaseDate;
     @NotNull
-    private final Duration duration;
+    private final long duration;
+
+    @Builder.Default
+    private Long rate = 0L;
+
+    public void addRate() {
+        ++rate;
+    }
+
+    public void deleteRate() {
+        --rate;
+    }
 }

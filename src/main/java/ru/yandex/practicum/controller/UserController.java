@@ -1,64 +1,88 @@
 package ru.yandex.practicum.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.User;
+import ru.yandex.practicum.service.UserService;
+import ru.yandex.practicum.storage.user.UserStorage;
 
-import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
 
 @RestController
 @Slf4j
 public class UserController {
-    private final Map<String, User> users = new HashMap<>();
+    private final UserStorage userStorage;
+    private final UserService userService;
+
+
+    @Autowired
+    public UserController(UserStorage userStorage) {
+        this.userStorage = userStorage;
+        this.userService = new UserService(userStorage);
+    }
 
     //Create user
     @PostMapping("/users")
-    public void create(@RequestBody User user) {
-        validate(user);
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.warn("У пользователя поле nickname и login одинаковый, т.к. поле nickname было пустое");
-            user = user.toBuilder().name(user.getLogin()).build();
+    public User create(@RequestBody User user) {
+        if (user.getFriends() == null) {
+            //Создаем множество друзей напрямую
+            user = user.toBuilder().friends(new HashSet<>()).build();
         }
-        log.debug("Пользователь: {}, успешно создан", user);
-        users.put(user.getLogin(), user);
+        //Назначаем id пользователю
+        return userStorage.create(user);
     }
 
     //Update user
     @PutMapping("/users")
-    public void update(@RequestBody User user) {
-        validate(user);
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.warn("У пользователя поле nickname и login одинаковый, т.к. поле nickname было пустое");
-            user = user.toBuilder().name(user.getLogin()).build();
+    public User update(@RequestBody User user) {
+        if (user.getFriends() == null) {
+            //Создаем множество друзей напрямую
+            user = user.toBuilder().friends(new HashSet<>()).build();
         }
-        log.debug("Пользователь: {}, успешно обновлен", user);
-        users.put(user.getLogin(), user);
+        return userStorage.update(user);
     }
 
-    //get user
+    //Get all users
     @GetMapping("/users")
     public Collection<User> findAll() {
-        return users.values();
+        return userStorage.findAll();
     }
 
-    private void validate(@Valid User user) {
-        if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.warn("У пользователя поле email пустое или не содержит '@'");
-            throw new ValidationException("Поле с email не может быть пустым или email должен содержать '@'");
-        }
-        if (user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.warn("У пользователя поле login пустое или содержит пробел");
-            throw new ValidationException("Логин не должен быть пустым и при этом не должен содержать пробелы");
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("У пользователя поле dateOfBirth не правильно определено");
-            throw new ValidationException("День рождения не может быть в будущем");
-        }
+    @GetMapping("/users/{id}")
+    public User findUserById(@PathVariable("id") Long userId) {
+        return userStorage.findUserById(userId);
     }
+
+    @DeleteMapping("/uders/{id}")
+    public void delete(@PathVariable("id") Long userId) {
+        userStorage.delete(userId);
+    }
+
+    //Adding to friends
+    @PutMapping("/users/{id}/friends/{friendId}")
+    public void addToFriend(@PathVariable("id") Long userId, @PathVariable Long friendId) {
+        userService.addToFriend(userId, friendId);
+    }
+
+    //Removing from friends
+    @DeleteMapping("/users/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable("id") Long userId, @PathVariable Long friendId) {
+        userService.deleteFriend(userId, friendId);
+    }
+
+    //Get list friends
+    @GetMapping("/users/{id}/friends")
+    public List<User> getFriends(@PathVariable("id") Long userId) {
+        return userService.getFriends(userId);
+    }
+
+    //Get mutual friends
+    @GetMapping("/users/{id}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable("id") Long userId, @PathVariable("otherId") Long friendId) {
+        return userService.getMutualFriends(userId, friendId);
+    }
+
 }
