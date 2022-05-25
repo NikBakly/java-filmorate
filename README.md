@@ -3,7 +3,7 @@ Template repository for Filmorate project.
 
 # Database diagram
 
-![database diagram](images/database diagram.png)
+![](images/database_diagram.png)
 
 ## Примеры запросов в БД с помощью SQL
     
