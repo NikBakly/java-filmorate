@@ -27,11 +27,11 @@ public class UserService {
         userStorage
                 .findUserById(userId)
                 .getFriends()
-                .add(friendId);
+                .put(friendId, Boolean.TRUE);
         userStorage
                 .findUserById(friendId)
                 .getFriends()
-                .add(userId);
+                .put(userId, Boolean.FALSE);
         log.debug("Добавление в друзья прошло успешно у пользователей id = {} и id = {}", userId, friendId);
 
     }
@@ -51,9 +51,9 @@ public class UserService {
         validateCheckUser(userId);
         validateCheckUser(friendId);
         //друзья пользователя
-        Set<Long> friendsUser = userStorage.findUserById(userId).getFriends();
+        Set<Long> friendsUser = userStorage.findUserById(userId).getFriends().keySet();
         //друзья друга
-        Set<Long> friendsFriend = userStorage.findUserById(friendId).getFriends();
+        Set<Long> friendsFriend = userStorage.findUserById(friendId).getFriends().keySet();
         //список общих друзей
         List<User> mutualFriends = new ArrayList<>();
 
@@ -69,7 +69,7 @@ public class UserService {
     public List<User> getFriends(Long userId) {
         validateCheckUser(userId);
         List<User> friends = new ArrayList<>();
-        for (Long idFriend : userStorage.findUserById(userId).getFriends()) {
+        for (Long idFriend : userStorage.findUserById(userId).getFriends().keySet()) {
             friends.add(userStorage.findUserById(idFriend));
         }
         log.debug("Все друзья вернулись успешно у пользователя id = {}", userId);

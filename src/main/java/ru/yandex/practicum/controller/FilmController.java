@@ -24,8 +24,8 @@ public class FilmController {
     //Create film
     @PostMapping("/films")
     public Film create(@RequestBody Film film) {
-        if (film.getRate() == null) {
-            film = film.toBuilder().rate(0L).build();
+        if (film.getNumberOfLikes() == null) {
+            film = film.toBuilder().numberOfLikes(0L).build();
         }
         return filmStorage.create(film);
     }

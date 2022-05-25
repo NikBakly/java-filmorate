@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.service.IdFilmService;
 import ru.yandex.practicum.storage.film.FilmStorage;
 import ru.yandex.practicum.storage.film.InMemoryFilmStorage;
 
@@ -21,13 +20,13 @@ class FilmControllerTest {
 
     @BeforeEach
     void init() {
-        FilmStorage filmStorage = new InMemoryFilmStorage(new IdFilmService());
+        FilmStorage filmStorage = new InMemoryFilmStorage();
         controllerFilm = new FilmController(filmStorage);
         guardian = Film.builder()
                 .id(1L)
                 .name("guardian")
                 .description("Бывший агент элитных спецслужб спасает девочку")
-                .duration(91)
+                .durationInMinutes(91)
                 .releaseDate(LocalDate.of(2012, 4, 26))
                 .build();
     }
@@ -39,7 +38,7 @@ class FilmControllerTest {
                 .name("")
                 .description("very cute")
                 .releaseDate(LocalDate.of(2001, 12, 23))
-                .duration(93)
+                .durationInMinutes(93)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
@@ -58,7 +57,7 @@ class FilmControllerTest {
                         " Чувства молодых людей только успевают расцвести, и даже не классовые различия создадут" +
                         " испытания влюблённым, а айсберг, вставший на пути считавшегося непотопляемым лайнера.")
                 .releaseDate(LocalDate.of(1998, 2, 20))
-                .duration(134)
+                .durationInMinutes(134)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(titanic));
@@ -73,7 +72,7 @@ class FilmControllerTest {
                 .name("test")
                 .description("Test")
                 .releaseDate(LocalDate.of(1890, 2, 20))
-                .duration(50)
+                .durationInMinutes(50)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
@@ -88,7 +87,7 @@ class FilmControllerTest {
                 .name("test")
                 .description("Test")
                 .releaseDate(LocalDate.of(1900, 2, 20))
-                .duration(-10)
+                .durationInMinutes(-10)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
@@ -103,7 +102,7 @@ class FilmControllerTest {
                 .name("test")
                 .description("Test")
                 .releaseDate(LocalDate.of(1900, 2, 20))
-                .duration(0)
+                .durationInMinutes(0)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
@@ -118,7 +117,7 @@ class FilmControllerTest {
                 .name("film")
                 .description("film")
                 .releaseDate(LocalDate.of(1999, 2, 20))
-                .duration(60)
+                .durationInMinutes(60)
                 .build();
 
         controllerFilm.create(film);
@@ -131,7 +130,7 @@ class FilmControllerTest {
         controllerFilm.create(guardian);
         controllerFilm.addLike(guardian.getId(), 1L);
 
-        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getRate();
+        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getNumberOfLikes();
         Assertions.assertEquals(1L, expectedRate);
     }
 
@@ -144,7 +143,7 @@ class FilmControllerTest {
 
         controllerFilm.deleteLike(guardian.getId(), 1L);
 
-        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getRate();
+        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getNumberOfLikes();
         Assertions.assertEquals(1L, expectedRate);
     }
 
@@ -155,7 +154,7 @@ class FilmControllerTest {
                 .name("test")
                 .description("very cute test")
                 .releaseDate(LocalDate.of(2022, 1, 1))
-                .duration(25)
+                .durationInMinutes(25)
                 .build();
 
         controllerFilm.create(guardian);

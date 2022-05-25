@@ -61,7 +61,7 @@ public class FilmService {
     public List<Film> getPopularFilms(Integer count) {
         List<Film> popularFilms = new ArrayList<>(filmStorage.findALl());
         //Сортировка по количеству лайков на убывание
-        popularFilms.sort((o1, o2) -> (int) (o2.getRate() - o1.getRate()));
+        popularFilms.sort((o1, o2) -> (int) (o2.getNumberOfLikes() - o1.getNumberOfLikes()));
 
         if (count != null && popularFilms.size() >= count) {
             return popularFilms.subList(0, count);
@@ -74,7 +74,7 @@ public class FilmService {
     private Long getFilmRate(Long filmId) {
         return filmStorage
                 .findFilmById(filmId)
-                .getRate();
+                .getNumberOfLikes();
     }
 
     //добавляет оценку фильму на один

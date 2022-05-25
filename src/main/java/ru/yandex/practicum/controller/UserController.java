@@ -8,6 +8,7 @@ import ru.yandex.practicum.service.UserService;
 import ru.yandex.practicum.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class UserController {
     public User create(@RequestBody User user) {
         if (user.getFriends() == null) {
             //Создаем множество друзей напрямую
-            user = user.toBuilder().friends(new HashSet<>()).build();
+            user = user.toBuilder().friends(new HashMap<>()).build();
         }
         //Назначаем id пользователю
         return userStorage.create(user);
@@ -40,7 +41,7 @@ public class UserController {
     public User update(@RequestBody User user) {
         if (user.getFriends() == null) {
             //Создаем множество друзей напрямую
-            user = user.toBuilder().friends(new HashSet<>()).build();
+            user = user.toBuilder().friends(new HashMap<>()).build();
         }
         return userStorage.update(user);
     }
