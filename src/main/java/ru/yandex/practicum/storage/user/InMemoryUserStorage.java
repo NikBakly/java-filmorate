@@ -35,6 +35,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(User user) {
         validate(user);
+        checkUser(user.getId());
         if (user.getName() == null || user.getName().isBlank()) {
             log.warn("У пользователя поле nickname и login одинаковый, т.к. поле nickname было пустое");
             user = user.toBuilder().name(user.getLogin()).build();
