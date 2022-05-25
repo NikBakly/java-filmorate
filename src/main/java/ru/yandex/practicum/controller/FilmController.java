@@ -33,6 +33,9 @@ public class FilmController {
     //Update film
     @PutMapping("/films")
     public Film update(@RequestBody Film film) {
+        if (film.getNumberOfLikes() == null) {
+            film = film.toBuilder().numberOfLikes(0L).build();
+        }
         return filmStorage.update(film);
     }
 

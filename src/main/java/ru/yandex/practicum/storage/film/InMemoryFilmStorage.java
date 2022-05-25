@@ -59,7 +59,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     private void checkFilm(Long filmId) {
-        if (filmId < 0 || !films.containsKey(filmId)) {
+        if (!films.containsKey(filmId)) {
             log.warn("Фильм id " + filmId + " не найден");
             throw new NotFoundException("Фильм id " + filmId + " не найден");
         }
@@ -78,7 +78,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.warn("У фильма поле realeseDate раньше даты 28 декабря 1985");
             throw new ValidationException("Дата релиза не должна быть раньше чем 28 декабря 1985");
         }
-        if (film.getDurationInMinutes() <= 0) {
+        if (film.getDuration() <= 0) {
             log.warn("У фильма поле duration не является положительным числом");
             throw new ValidationException("Продолжительность фильма должна быть положительной");
         }

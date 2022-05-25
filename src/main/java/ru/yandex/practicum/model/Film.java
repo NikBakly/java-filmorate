@@ -19,7 +19,7 @@ public class Film {
     @NotNull
     private final LocalDate releaseDate;
     @NotNull
-    private final int durationInMinutes;
+    private final int duration;
 
     @Builder.Default
     private Long numberOfLikes = 0L; // количество лайков

@@ -26,7 +26,7 @@ class FilmControllerTest {
                 .id(1L)
                 .name("guardian")
                 .description("Бывший агент элитных спецслужб спасает девочку")
-                .durationInMinutes(91)
+                .duration(91)
                 .releaseDate(LocalDate.of(2012, 4, 26))
                 .build();
     }
@@ -38,7 +38,7 @@ class FilmControllerTest {
                 .name("")
                 .description("very cute")
                 .releaseDate(LocalDate.of(2001, 12, 23))
-                .durationInMinutes(93)
+                .duration(93)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
@@ -57,7 +57,7 @@ class FilmControllerTest {
                         " Чувства молодых людей только успевают расцвести, и даже не классовые различия создадут" +
                         " испытания влюблённым, а айсберг, вставший на пути считавшегося непотопляемым лайнера.")
                 .releaseDate(LocalDate.of(1998, 2, 20))
-                .durationInMinutes(134)
+                .duration(134)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(titanic));
@@ -72,7 +72,7 @@ class FilmControllerTest {
                 .name("test")
                 .description("Test")
                 .releaseDate(LocalDate.of(1890, 2, 20))
-                .durationInMinutes(50)
+                .duration(50)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
@@ -87,7 +87,7 @@ class FilmControllerTest {
                 .name("test")
                 .description("Test")
                 .releaseDate(LocalDate.of(1900, 2, 20))
-                .durationInMinutes(-10)
+                .duration(-10)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
@@ -102,7 +102,7 @@ class FilmControllerTest {
                 .name("test")
                 .description("Test")
                 .releaseDate(LocalDate.of(1900, 2, 20))
-                .durationInMinutes(0)
+                .duration(0)
                 .build();
 
         ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
@@ -117,7 +117,7 @@ class FilmControllerTest {
                 .name("film")
                 .description("film")
                 .releaseDate(LocalDate.of(1999, 2, 20))
-                .durationInMinutes(60)
+                .duration(60)
                 .build();
 
         controllerFilm.create(film);
@@ -154,7 +154,7 @@ class FilmControllerTest {
                 .name("test")
                 .description("very cute test")
                 .releaseDate(LocalDate.of(2022, 1, 1))
-                .durationInMinutes(25)
+                .duration(25)
                 .build();
 
         controllerFilm.create(guardian);
