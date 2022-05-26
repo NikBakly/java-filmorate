@@ -1,12 +1,10 @@
 package ru.yandex.practicum.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.User;
-import ru.yandex.practicum.service.IdUserService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -17,12 +15,8 @@ import java.util.Map;
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
-    private final IdUserService idUserService;
 
-    @Autowired
-    public InMemoryUserStorage(IdUserService idUserService) {
-        this.idUserService = idUserService;
-    }
+    private Long nextUserId = 1L;
 
     @Override
     public User create(User user) {
@@ -32,7 +26,7 @@ public class InMemoryUserStorage implements UserStorage {
             user = user.toBuilder().name(user.getLogin()).build();
         }
         //назначаем id пользователю
-        user = user.toBuilder().id(idUserService.getNextUserId()).build();
+        user = user.toBuilder().id(nextUserId++).build();
         log.debug("Пользователь: {}, успешно создан", user);
         users.put(user.getId(), user);
         return user;
@@ -41,6 +35,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(User user) {
         validate(user);
+        checkUser(user.getId());
         if (user.getName() == null || user.getName().isBlank()) {
             log.warn("У пользователя поле nickname и login одинаковый, т.к. поле nickname было пустое");
             user = user.toBuilder().name(user.getLogin()).build();

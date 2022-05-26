@@ -24,8 +24,8 @@ public class FilmController {
     //Create film
     @PostMapping("/films")
     public Film create(@RequestBody Film film) {
-        if (film.getRate() == null) {
-            film = film.toBuilder().rate(0L).build();
+        if (film.getNumberOfLikes() == null) {
+            film = film.toBuilder().numberOfLikes(0L).build();
         }
         return filmStorage.create(film);
     }
@@ -33,6 +33,9 @@ public class FilmController {
     //Update film
     @PutMapping("/films")
     public Film update(@RequestBody Film film) {
+        if (film.getNumberOfLikes() == null) {
+            film = film.toBuilder().numberOfLikes(0L).build();
+        }
         return filmStorage.update(film);
     }
 

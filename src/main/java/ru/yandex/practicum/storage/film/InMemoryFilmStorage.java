@@ -1,12 +1,10 @@
 package ru.yandex.practicum.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.service.IdFilmService;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -18,18 +16,14 @@ import java.util.Map;
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
-    private final IdFilmService idFilmService;
 
-    @Autowired
-    public InMemoryFilmStorage(IdFilmService idFilmService) {
-        this.idFilmService = idFilmService;
-    }
+    private Long nextFilmId = 1L;
 
     @Override
     public Film create(Film film) {
         validate(film);
         //назначаем id фильму
-        film = film.toBuilder().id(idFilmService.getNextFilmId()).build();
+        film = film.toBuilder().id(nextFilmId++).build();
         log.debug("Фильм: {}, успешно создан", film);
         films.put(film.getId(), film);
         return film;
@@ -64,8 +58,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.get(filmId);
     }
 
-    private void checkFilm(Long filmId){
-        if (filmId < 0 || !films.containsKey(filmId)){
+    private void checkFilm(Long filmId) {
+        if (!films.containsKey(filmId)) {
             log.warn("Фильм id " + filmId + " не найден");
             throw new NotFoundException("Фильм id " + filmId + " не найден");
         }

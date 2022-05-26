@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.service.IdFilmService;
 import ru.yandex.practicum.storage.film.FilmStorage;
 import ru.yandex.practicum.storage.film.InMemoryFilmStorage;
 
@@ -21,7 +20,7 @@ class FilmControllerTest {
 
     @BeforeEach
     void init() {
-        FilmStorage filmStorage = new InMemoryFilmStorage(new IdFilmService());
+        FilmStorage filmStorage = new InMemoryFilmStorage();
         controllerFilm = new FilmController(filmStorage);
         guardian = Film.builder()
                 .id(1L)
@@ -131,7 +130,7 @@ class FilmControllerTest {
         controllerFilm.create(guardian);
         controllerFilm.addLike(guardian.getId(), 1L);
 
-        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getRate();
+        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getNumberOfLikes();
         Assertions.assertEquals(1L, expectedRate);
     }
 
@@ -144,7 +143,7 @@ class FilmControllerTest {
 
         controllerFilm.deleteLike(guardian.getId(), 1L);
 
-        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getRate();
+        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getNumberOfLikes();
         Assertions.assertEquals(1L, expectedRate);
     }
 

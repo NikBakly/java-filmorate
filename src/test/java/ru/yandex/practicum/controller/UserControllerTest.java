@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.User;
-import ru.yandex.practicum.service.IdUserService;
 import ru.yandex.practicum.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.storage.user.UserStorage;
 
@@ -24,7 +23,7 @@ class UserControllerTest {
 
     @BeforeEach
     void init() {
-        UserStorage userStorage = new InMemoryUserStorage(new IdUserService());
+        UserStorage userStorage = new InMemoryUserStorage();
         controllerUser = new UserController(userStorage);
         nikita = User.builder()
                 .id(1L)
@@ -147,7 +146,7 @@ class UserControllerTest {
 
         controllerUser.addToFriend(nikita.getId(), sasha.getId());
 
-        Assertions.assertTrue(nikita.getFriends().contains(2L) && sasha.getFriends().contains(1L));
+        Assertions.assertTrue(nikita.getFriends().containsKey(2L) && sasha.getFriends().containsKey(1L));
     }
 
     @Test
@@ -158,7 +157,7 @@ class UserControllerTest {
 
         controllerUser.deleteFriend(nikita.getId(), sasha.getId());
 
-        Assertions.assertFalse(nikita.getFriends().contains(2L) && sasha.getFriends().contains(1L));
+        Assertions.assertFalse(nikita.getFriends().containsKey(2L) && sasha.getFriends().containsKey(1L));
     }
 
     @Test

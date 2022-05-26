@@ -7,6 +7,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,19 +15,15 @@ import java.util.Set;
 @Builder(toBuilder = true)
 public class User {
     private final Long id;
-    @Email
-    private final String email;
     private final String name;
     @NotBlank
     @NotNull
     private final String login;
+    @Email
+    private final String email;
     @NotNull
     private final LocalDate birthday;
 
     @Builder.Default
-    private final Set<Long> friends = new HashSet<>();
-
-    public Set<Long> getFriends() {
-        return friends;
-    }
+    private final HashMap<Long, Boolean> friends = new HashMap<>(); // {userId : статусДружбы}
 }
