@@ -13,22 +13,20 @@ public class Film {
     private Long id;
     @NotEmpty
     private final String name;
-    private final String genre;
     private final String description;
-    private final String MPA; // возрастное ограничение фильма
+    private final MPA mpa; // возрастное ограничение фильма
     @NotNull
     private final LocalDate releaseDate;
     @NotNull
     private final int duration;
-
     @Builder.Default
-    private Long numberOfLikes = 0L; // количество лайков
+    private Long rate = 0L; // количество лайков
 
     public void addRate() {
-        ++numberOfLikes;
+        ++rate;
     }
 
     public void deleteRate() {
-        --numberOfLikes;
+        --rate;
     }
 }

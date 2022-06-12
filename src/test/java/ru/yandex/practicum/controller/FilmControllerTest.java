@@ -1,32 +1,44 @@
 package ru.yandex.practicum.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.storage.film.FilmStorage;
-import ru.yandex.practicum.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.model.MPA;
+import ru.yandex.practicum.model.User;
+import ru.yandex.practicum.service.FilmService;
+import ru.yandex.practicum.service.UserService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class FilmControllerTest {
-    private FilmController controllerFilm;
+    private FilmController filmController;
+    private UserService userService;
     private Film guardian;
 
     @BeforeEach
-    void init() {
-        FilmStorage filmStorage = new InMemoryFilmStorage();
-        controllerFilm = new FilmController(filmStorage);
+    void init(@Autowired FilmController filmController, @Autowired UserService userService) {
+        this.filmController = filmController;
+        this.userService = userService;
         guardian = Film.builder()
                 .id(1L)
                 .name("guardian")
                 .description("Бывший агент элитных спецслужб спасает девочку")
                 .duration(91)
+                .mpa(MPA.builder().id(1).name("G").build())
                 .releaseDate(LocalDate.of(2012, 4, 26))
                 .build();
     }
@@ -41,7 +53,7 @@ class FilmControllerTest {
                 .duration(93)
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> filmController.create(film));
 
         Assertions.assertEquals("Название фильма не может быть пустым", thrown.getMessage());
     }
@@ -60,7 +72,7 @@ class FilmControllerTest {
                 .duration(134)
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(titanic));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> filmController.create(titanic));
 
         Assertions.assertEquals("Описание фильма не может превышать 200 символов", thrown.getMessage());
     }
@@ -75,7 +87,7 @@ class FilmControllerTest {
                 .duration(50)
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> filmController.create(film));
 
         Assertions.assertEquals("Дата релиза не должна быть раньше чем 28 декабря 1985", thrown.getMessage());
     }
@@ -90,7 +102,7 @@ class FilmControllerTest {
                 .duration(-10)
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> filmController.create(film));
 
         Assertions.assertEquals("Продолжительность фильма должна быть положительной", thrown.getMessage());
     }
@@ -105,7 +117,7 @@ class FilmControllerTest {
                 .duration(0)
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerFilm.create(film));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> filmController.create(film));
 
         Assertions.assertEquals("Продолжительность фильма должна быть положительной", thrown.getMessage());
     }
@@ -117,33 +129,55 @@ class FilmControllerTest {
                 .name("film")
                 .description("film")
                 .releaseDate(LocalDate.of(1999, 2, 20))
+                .mpa(MPA.builder().id(1).name("G").build())
                 .duration(60)
                 .build();
 
-        controllerFilm.create(film);
-
-        Assertions.assertTrue(controllerFilm.findAll().contains(film));
+        filmController.create(film);
+        Assertions.assertTrue(filmController.findAll().contains(film));
     }
 
     @Test
     void test7_shouldAddLike() {
-        controllerFilm.create(guardian);
-        controllerFilm.addLike(guardian.getId(), 1L);
+        filmController.create(guardian);
+        User firstUser = User.builder()
+                .id(1L)
+                .email("test1@ya.ru")
+                .login("test1")
+                .name("testing1")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+        userService.create(firstUser);
+        filmController.addLike(guardian.getId(), 1L);
 
-        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getNumberOfLikes();
+        Long expectedRate = filmController.findFilmById(guardian.getId()).getRate();
         Assertions.assertEquals(1L, expectedRate);
     }
 
     @Test
     void test8_shouldDeleteLike() {
-        controllerFilm.create(guardian);
+        filmController.create(guardian);
+        User firstUser = User.builder()
+                .email("test1@ya.ru")
+                .login("test1")
+                .name("testing1")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+        User secondUser = User.builder()
+                .email("test2@ya.ru")
+                .login("test2")
+                .name("testing2")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+        userService.create(firstUser);
+        userService.create(secondUser);
 
-        controllerFilm.addLike(guardian.getId(), 1L);
-        controllerFilm.addLike(guardian.getId(), 2L);
+        filmController.addLike(guardian.getId(), 1L);
+        filmController.addLike(guardian.getId(), 2L);
 
-        controllerFilm.deleteLike(guardian.getId(), 1L);
+        filmController.deleteLike(guardian.getId(), 1L);
 
-        Long expectedRate = controllerFilm.findFilmById(guardian.getId()).getNumberOfLikes();
+        Long expectedRate = filmController.findFilmById(guardian.getId()).getRate();
         Assertions.assertEquals(1L, expectedRate);
     }
 
@@ -154,32 +188,59 @@ class FilmControllerTest {
                 .name("test")
                 .description("very cute test")
                 .releaseDate(LocalDate.of(2022, 1, 1))
+                .mpa(MPA.builder().id(1).name("G").build())
                 .duration(25)
                 .build();
 
-        controllerFilm.create(guardian);
-        controllerFilm.create(testFilm);
+        filmController.create(guardian);
+        filmController.create(testFilm);
 
-        controllerFilm.addLike(guardian.getId(), 1L);
-        controllerFilm.addLike(guardian.getId(), 2L);
+        User firstUser = User.builder()
+                .email("test1@ya.ru")
+                .login("test1")
+                .name("testing1")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+        User secondUser = User.builder()
+                .email("test2@ya.ru")
+                .login("test2")
+                .name("testing2")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+        User thirdUser = User.builder()
+                .email("test3@ya.ru")
+                .login("test3")
+                .name("testing3")
+                .birthday(LocalDate.of(2002, 10, 10))
+                .build();
+        userService.create(firstUser);
+        userService.create(secondUser);
+        userService.create(thirdUser);
 
-        controllerFilm.addLike(testFilm.getId(), 3L);
+        filmController.addLike(guardian.getId(), 1L);
+        filmController.addLike(guardian.getId(), 2L);
+        guardian = guardian.toBuilder().rate(2L).build();
 
-        List<Film> popularFilms = controllerFilm.getPopularFilms(2);
+        filmController.addLike(testFilm.getId(), 3L);
+        testFilm = testFilm.toBuilder().rate(1L).build();
+
+        List<Film> popularFilms = filmController.getPopularFilms(2);
 
         List<Film> expectedPopularFilms = new ArrayList<>();
-        expectedPopularFilms.add(controllerFilm.findFilmById(guardian.getId()));
-        expectedPopularFilms.add(controllerFilm.findFilmById(testFilm.getId()));
+        expectedPopularFilms.add(guardian);
+        expectedPopularFilms.add(testFilm);
 
         Assertions.assertEquals(expectedPopularFilms, popularFilms);
     }
 
     @Test
     void test10_shouldDeleteFilmById() {
-        controllerFilm.create(guardian);
+        filmController.create(guardian);
 
-        controllerFilm.delete(guardian.getId());
+        filmController.delete(guardian.getId());
 
-        Assertions.assertEquals(0, controllerFilm.findAll().size());
+        Collection<Film> expected = filmController.findAll();
+
+        Assertions.assertEquals(0, filmController.findAll().size());
     }
 }

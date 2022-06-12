@@ -3,13 +3,14 @@ package ru.yandex.practicum.storage.film;
 import ru.yandex.practicum.model.Film;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface FilmStorage {
     Film create(Film film);
 
     Film update(Film film);
 
-    void delete(Long filmId);
+    void deleteById(Long filmId);
 
     Film findFilmById(Long filmId);
 

@@ -5,61 +5,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.model.User;
 import ru.yandex.practicum.service.UserService;
-import ru.yandex.practicum.storage.user.UserStorage;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 @RestController
 @Slf4j
 public class UserController {
-    private final UserStorage userStorage;
     private final UserService userService;
 
-
     @Autowired
-    public UserController(UserStorage userStorage) {
-        this.userStorage = userStorage;
-        this.userService = new UserService(userStorage);
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     //Create user
     @PostMapping("/users")
     public User create(@RequestBody User user) {
-        if (user.getFriends() == null) {
-            //Создаем множество друзей напрямую
-            user = user.toBuilder().friends(new HashMap<>()).build();
-        }
-        //Назначаем id пользователю
-        return userStorage.create(user);
+        return userService.create(user);
     }
 
     //Update user
     @PutMapping("/users")
     public User update(@RequestBody User user) {
-        if (user.getFriends() == null) {
-            //Создаем множество друзей напрямую
-            user = user.toBuilder().friends(new HashMap<>()).build();
-        }
-        return userStorage.update(user);
+        return userService.update(user);
     }
 
     //Get all users
     @GetMapping("/users")
     public Collection<User> findAll() {
-        return userStorage.findAll();
+        return userService.findAll();
     }
 
     @GetMapping("/users/{id}")
     public User findUserById(@PathVariable("id") Long userId) {
-        return userStorage.findUserById(userId);
+        return userService.findUserById(userId);
     }
 
     @DeleteMapping("/uders/{id}")
     public void delete(@PathVariable("id") Long userId) {
-        userStorage.delete(userId);
+        userService.delete(userId);
     }
 
     //Adding to friends

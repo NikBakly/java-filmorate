@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -39,7 +40,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void delete(Long filmId) {
+    public void deleteById(Long filmId) {
         checkFilm(filmId);
         films.remove(filmId);
     }
