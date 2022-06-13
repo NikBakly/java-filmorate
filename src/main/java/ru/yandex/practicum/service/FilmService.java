@@ -8,7 +8,8 @@ import ru.yandex.practicum.model.Film;
 import ru.yandex.practicum.storage.FilmLikes.FilmLikesStorage;
 import ru.yandex.practicum.storage.film.FilmStorage;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -70,7 +71,7 @@ public class FilmService {
     }
 
     private void validateCheckUser(Long userId) {
-        if(userId < 0){
+        if (userId < 0) {
             log.warn("Пользователь под id " + userId + " не найден");
             throw new NotFoundException("Пользователь под id " + userId + " не найден");
         }

@@ -121,7 +121,7 @@ public class FriendshipDbStorage implements FriendshipStorage {
         return row.getBoolean("STATUS");
     }
 
-    private void validateCheckUser(Long userId){
+    private void validateCheckUser(Long userId) {
         String sqlQuery = "SELECT USER_ID " +
                 "FROM USERS WHERE USER_ID = ?";
         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, userId);

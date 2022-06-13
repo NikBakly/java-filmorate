@@ -2,19 +2,13 @@ package ru.yandex.practicum.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.User;
 import ru.yandex.practicum.storage.friendship.FriendshipStorage;
 import ru.yandex.practicum.storage.user.UserStorage;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 @Service
 @Slf4j
