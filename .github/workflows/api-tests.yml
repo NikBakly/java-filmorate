@@ -40,7 +40,7 @@ jobs:
           path: tests
 
       - name: Run Application
-        run: nohup mvn spring-boot:run &
+        run: timeout 60 mvn spring-boot:run
 
       - name: Waiting for application is up
         run: /tmp/wait-for-it.sh -t 120 localhost:8080 -- echo "application is up"
