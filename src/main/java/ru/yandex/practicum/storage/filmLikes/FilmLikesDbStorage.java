@@ -1,10 +1,10 @@
-package ru.yandex.practicum.storage.FilmLikes;
+package ru.yandex.practicum.storage.filmLikes;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.model.MPA;
+import ru.yandex.practicum.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,7 +48,7 @@ public class FilmLikesDbStorage implements FilmLikesStorage {
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         int mpaId = resultSet.getInt("MPA_ID");
         String sqlFindName = "SELECT MPA_ID, NAME FROM MPA WHERE MPA_ID = ?";
-        MPA mpa = jdbcTemplate.queryForObject(sqlFindName, this::mapRowToMpa, mpaId);
+        Mpa mpa = jdbcTemplate.queryForObject(sqlFindName, this::mapRowToMpa, mpaId);
 
         return Film.builder()
                 .id(resultSet.getLong("FILM_ID"))
@@ -61,8 +61,8 @@ public class FilmLikesDbStorage implements FilmLikesStorage {
                 .build();
     }
 
-    private MPA mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
-        return MPA.builder()
+    private Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
+        return Mpa.builder()
                 .id(resultSet.getInt("MPA_ID"))
                 .name(resultSet.getString("NAME"))
                 .build();

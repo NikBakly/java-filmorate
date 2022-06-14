@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.model.MPA;
+import ru.yandex.practicum.model.Mpa;
 
 import javax.validation.Valid;
 import java.sql.Date;
@@ -99,7 +99,7 @@ public class FilmDbStorage implements FilmStorage {
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         int MPAId = resultSet.getInt("MPA_ID");
         String sqlFindName = "SELECT MPA_ID, NAME FROM MPA WHERE MPA_ID = ?";
-        MPA mpa = jdbcTemplate.queryForObject(sqlFindName, this::mapRowToMpa, MPAId);
+        Mpa mpa = jdbcTemplate.queryForObject(sqlFindName, this::mapRowToMpa, MPAId);
 
         return Film.builder()
                 .id(resultSet.getLong("FILM_ID"))
@@ -112,8 +112,8 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
-    private MPA mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
-        return MPA.builder()
+    private Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
+        return Mpa.builder()
                 .id(resultSet.getInt("MPA_ID"))
                 .name(resultSet.getString("NAME"))
                 .build();

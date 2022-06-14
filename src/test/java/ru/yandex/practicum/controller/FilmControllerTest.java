@@ -10,9 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.model.MPA;
+import ru.yandex.practicum.model.Mpa;
 import ru.yandex.practicum.model.User;
-import ru.yandex.practicum.service.FilmService;
 import ru.yandex.practicum.service.UserService;
 
 import java.time.LocalDate;
@@ -38,7 +37,7 @@ class FilmControllerTest {
                 .name("guardian")
                 .description("Бывший агент элитных спецслужб спасает девочку")
                 .duration(91)
-                .mpa(MPA.builder().id(1).name("G").build())
+                .mpa(Mpa.builder().id(1).name("G").build())
                 .releaseDate(LocalDate.of(2012, 4, 26))
                 .build();
     }
@@ -129,7 +128,7 @@ class FilmControllerTest {
                 .name("film")
                 .description("film")
                 .releaseDate(LocalDate.of(1999, 2, 20))
-                .mpa(MPA.builder().id(1).name("G").build())
+                .mpa(Mpa.builder().id(1).name("G").build())
                 .duration(60)
                 .build();
 
@@ -188,7 +187,7 @@ class FilmControllerTest {
                 .name("test")
                 .description("very cute test")
                 .releaseDate(LocalDate.of(2022, 1, 1))
-                .mpa(MPA.builder().id(1).name("G").build())
+                .mpa(Mpa.builder().id(1).name("G").build())
                 .duration(25)
                 .build();
 
