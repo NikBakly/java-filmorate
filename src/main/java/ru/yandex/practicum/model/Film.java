@@ -23,12 +23,4 @@ public class Film {
     private LinkedHashSet<Genre> genres;
     @Builder.Default
     private Long rate = 0L; // количество лайков
-
-    public void addRate() {
-        ++rate;
-    }
-
-    public void deleteRate() {
-        --rate;
-    }
 }
