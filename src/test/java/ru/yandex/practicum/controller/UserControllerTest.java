@@ -1,42 +1,43 @@
 package ru.yandex.practicum.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.exception.ValidationException;
 import ru.yandex.practicum.model.User;
-import ru.yandex.practicum.storage.user.InMemoryUserStorage;
-import ru.yandex.practicum.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserControllerTest {
-    private UserController controllerUser;
-    private User nikita;
-    private User sasha;
-
-    UserControllerTest() {
-    }
+    private UserController userController;
+    private User firstUser;
+    private User secondUser;
 
     @BeforeEach
-    void init() {
-        UserStorage userStorage = new InMemoryUserStorage();
-        controllerUser = new UserController(userStorage);
-        nikita = User.builder()
+    void init(@Autowired UserController userController) {
+        this.userController = userController;
+        firstUser = User.builder()
                 .id(1L)
-                .email("nikita@ya.ru")
-                .login("login")
-                .name("nickname")
+                .email("test1@ya.ru")
+                .login("test1")
+                .name("testing1")
                 .birthday(LocalDate.of(2002, 10, 10))
                 .build();
-        sasha = User.builder()
+        secondUser = User.builder()
                 .id(2L)
-                .email("sasha@ya.ru")
-                .login("login")
-                .name("nickname")
+                .email("test2@ya.ru")
+                .login("test2")
+                .name("testing2")
                 .birthday(LocalDate.of(2002, 10, 10))
                 .build();
     }
@@ -44,14 +45,13 @@ class UserControllerTest {
     @Test
     void test1_shouldThrowExceptionIfEmailWithoutCat() {
         User user = User.builder()
-                .id(1L)
                 .email("nikita")
                 .login("login")
                 .name("nickname")
                 .birthday(LocalDate.of(2002, 7, 16))
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerUser.create(user));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> userController.create(user));
 
         Assertions.assertEquals("Поле с email не может быть пустым или email должен содержать '@'",
                 thrown.getMessage());
@@ -60,14 +60,13 @@ class UserControllerTest {
     @Test
     void test2_shouldThrowExceptionIfEmailIsEmpty() {
         User user = User.builder()
-                .id(1L)
                 .email("")
                 .login("login")
                 .name("nickname")
                 .birthday(LocalDate.of(2002, 7, 16))
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerUser.create(user));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> userController.create(user));
 
         Assertions.assertEquals("Поле с email не может быть пустым или email должен содержать '@'",
                 thrown.getMessage());
@@ -76,14 +75,13 @@ class UserControllerTest {
     @Test
     void test3_shouldThrowExceptionIfLoginIsEmpty() {
         User user = User.builder()
-                .id(1L)
                 .email("nik@ya.ru")
                 .login("")
                 .name("nickname")
                 .birthday(LocalDate.of(2002, 7, 16))
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerUser.create(user));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> userController.create(user));
 
         Assertions.assertEquals("Логин не должен быть пустым и при этом не должен содержать пробелы",
                 thrown.getMessage());
@@ -92,14 +90,13 @@ class UserControllerTest {
     @Test
     void test4_shouldThrowExceptionIfLoginContainsSpaces() {
         User user = User.builder()
-                .id(1L)
                 .email("nik@ya.ru")
                 .login("lo gin")
                 .name("nickname")
                 .birthday(LocalDate.of(2002, 7, 16))
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerUser.create(user));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> userController.create(user));
 
         Assertions.assertEquals("Логин не должен быть пустым и при этом не должен содержать пробелы",
                 thrown.getMessage());
@@ -108,14 +105,13 @@ class UserControllerTest {
     @Test
     void test5_shouldThrowExceptionIfDateOfBirthInFuture() {
         User user = User.builder()
-                .id(1L)
                 .email("nik@ya.ru")
                 .login("login")
                 .name("nickname")
                 .birthday(LocalDate.of(2030, 12, 10))
                 .build();
 
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> controllerUser.create(user));
+        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> userController.create(user));
 
         Assertions.assertEquals("День рождения не может быть в будущем",
                 thrown.getMessage());
@@ -131,33 +127,34 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2021, 12, 10))
                 .build();
 
-        controllerUser.create(user);
+        userController.create(user);
 
         //по логике программы должно произойти то же самое
         user = user.toBuilder().name("login").build();
 
-        Assertions.assertTrue(controllerUser.findAll().contains(user));
+        Assertions.assertTrue(userController.findAll().contains(user));
     }
 
     @Test
     void test7_shouldAddToFriend() {
-        controllerUser.create(nikita);
-        controllerUser.create(sasha);
+        userController.create(firstUser);
+        userController.create(secondUser);
 
-        controllerUser.addToFriend(nikita.getId(), sasha.getId());
+        userController.addToFriend(firstUser.getId(), secondUser.getId());
 
-        Assertions.assertTrue(nikita.getFriends().containsKey(2L) && sasha.getFriends().containsKey(1L));
+        Assertions.assertTrue(userController.findUserById(firstUser.getId()).getFriends().contains(2L) &&
+                !userController.findUserById(secondUser.getId()).getFriends().contains(1L));
     }
 
     @Test
     void test8_shouldDeleteFriend() {
-        controllerUser.create(nikita);
-        controllerUser.create(sasha);
-        controllerUser.addToFriend(nikita.getId(), sasha.getId());
+        userController.create(firstUser);
+        userController.create(secondUser);
+        userController.addToFriend(firstUser.getId(), secondUser.getId());
 
-        controllerUser.deleteFriend(nikita.getId(), sasha.getId());
+        userController.deleteFriend(firstUser.getId(), secondUser.getId());
 
-        Assertions.assertFalse(nikita.getFriends().containsKey(2L) && sasha.getFriends().containsKey(1L));
+        Assertions.assertFalse(firstUser.getFriends().contains(2L) && secondUser.getFriends().contains(1L));
     }
 
     @Test
@@ -169,44 +166,25 @@ class UserControllerTest {
                 .name("nickname")
                 .birthday(LocalDate.of(2002, 10, 10))
                 .build();
-        User alex = User.builder()
-                .id(4L)
-                .email("vanya@ya.ru")
-                .login("login")
-                .name("nickname")
-                .birthday(LocalDate.of(2002, 10, 10))
-                .build();
-        User maks = User.builder()
-                .id(4L)
-                .email("maks@ya.ru")
-                .login("login")
-                .name("nickname")
-                .birthday(LocalDate.of(2002, 10, 10))
-                .build();
 
-        controllerUser.create(nikita);
-        controllerUser.create(sasha);
-        controllerUser.create(vanya);
-        controllerUser.create(alex);
-        controllerUser.create(maks);
+        userController.create(firstUser);
+        userController.create(secondUser);
+        userController.create(vanya);
 
-        controllerUser.addToFriend(nikita.getId(), sasha.getId());
-        controllerUser.addToFriend(nikita.getId(), vanya.getId());
-        controllerUser.addToFriend(nikita.getId(), maks.getId());
+        userController.addToFriend(firstUser.getId(), secondUser.getId());
+        userController.addToFriend(firstUser.getId(), vanya.getId());
+        userController.addToFriend(secondUser.getId(), vanya.getId());
 
-        controllerUser.addToFriend(sasha.getId(), vanya.getId());
-        controllerUser.addToFriend(sasha.getId(), alex.getId());
-
-        List<User> mutualFriends = controllerUser.getMutualFriends(nikita.getId(), sasha.getId());
-        Assertions.assertFalse(mutualFriends.size() == 1 && mutualFriends.contains(vanya));
+        List<User> mutualFriends = userController.getMutualFriends(firstUser.getId(), secondUser.getId());
+        Assertions.assertTrue(mutualFriends.size() == 1 && mutualFriends.contains(vanya));
     }
 
     @Test
     void test10_shouldDeleteFilmById() {
-        controllerUser.create(nikita);
+        userController.create(firstUser);
 
-        controllerUser.delete(nikita.getId());
+        userController.delete(firstUser.getId());
 
-        Assertions.assertEquals(0, controllerUser.findAll().size());
+        Assertions.assertEquals(0, userController.findAll().size());
     }
 }

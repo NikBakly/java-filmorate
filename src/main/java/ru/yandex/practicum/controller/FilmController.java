@@ -4,55 +4,45 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.model.Film;
 import ru.yandex.practicum.service.FilmService;
-import ru.yandex.practicum.storage.film.FilmStorage;
 
 import java.util.Collection;
 import java.util.List;
 
 @RestController
 public class FilmController {
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
-
     @Autowired
-    public FilmController(FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
-        this.filmService = new FilmService(filmStorage);
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
     }
 
     //Create film
     @PostMapping("/films")
     public Film create(@RequestBody Film film) {
-        if (film.getNumberOfLikes() == null) {
-            film = film.toBuilder().numberOfLikes(0L).build();
-        }
-        return filmStorage.create(film);
+        return filmService.create(film);
     }
 
     //Update film
     @PutMapping("/films")
     public Film update(@RequestBody Film film) {
-        if (film.getNumberOfLikes() == null) {
-            film = film.toBuilder().numberOfLikes(0L).build();
-        }
-        return filmStorage.update(film);
+        return filmService.update(film);
     }
 
     //get film
     @GetMapping("/films")
     public Collection<Film> findAll() {
-        return filmStorage.findALl();
+        return filmService.findAll();
     }
 
     @GetMapping("/films/{id}")
     public Film findFilmById(@PathVariable("id") Long filmId) {
-        return filmStorage.findFilmById(filmId);
+        return filmService.findFilmById(filmId);
     }
 
     @DeleteMapping("/films/{id}")
     public void delete(@PathVariable("id") Long filmId) {
-        filmStorage.delete(filmId);
+        filmService.delete(filmId);
     }
 
     //User likes the movie
